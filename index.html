@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dawat e Islami Trust - Workshop Software</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background: #f4f6fb; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 16px; position: relative; }
+        .watermark { position: fixed; bottom: 12px; right: 20px; font-size: 0.75rem; opacity: 0.25; color: #1e2b4f; font-weight: 500; letter-spacing: 0.5px; pointer-events: none; z-index: 999; }
+        .app-container { width: 100%; max-width: 1400px; background: white; border-radius: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        .app-header { background: #0b2d4e; color: white; padding: 20px 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-bottom: 4px solid #eab308; gap: 12px; }
+        .header-left h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+        .header-left h2 { font-size: 1.2rem; font-weight: 400; opacity: 0.9; margin-top: 4px; }
+        .header-left h3 { font-size: 1rem; font-weight: 300; opacity: 0.7; margin-top: 6px; }
+        .header-right { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .user-badge { background: #1e4a76; padding: 8px 18px; border-radius: 60px; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .btn-logout { background: #e11d48; border: none; color: white; padding: 8px 18px; border-radius: 60px; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+        .btn-logout:hover { background: #be123c; }
+        .btn-main-app { background: #0ea5e9; color: white; border: none; padding: 8px 18px; border-radius: 60px; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-main-app:hover { background: #0284c7; transform: scale(1.05); }
+        .main-panel { display: flex; flex: 1; min-height: 600px; }
+        .sidebar { width: 260px; background: #f8fafc; border-right: 1px solid #e2e8f0; padding: 24px 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+        .sidebar-tab { padding: 14px 20px; border-radius: 16px; font-weight: 600; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.15s; background: white; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02); border: 1px solid #e9eef4; white-space: nowrap; }
+        .sidebar-tab i { width: 22px; color: #2563eb; }
+        .sidebar-tab.active { background: #0b2d4e; color: white; border-color: #0b2d4e; box-shadow: 0 8px 20px -6px #0b2d4e80; }
+        .sidebar-tab.active i { color: #facc15; }
+        .content-area { flex: 1; padding: 28px 30px; overflow-y: auto; background: white; display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+        .page-title { font-size: 1.5rem; font-weight: 700; color: #0b2d4e; border-left: 6px solid #eab308; padding-left: 16px; margin-bottom: 8px; }
+        .card { background: white; border-radius: 24px; border: 1px solid #e9eef4; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02); padding: 20px 18px; }
+        .btn-primary { background: #0b2d4e; color: white; border: none; padding: 10px 22px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .btn-primary:hover { background: #1e4a76; }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-secondary { background: #e2e8f0; border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; color: #1e293b; }
+        .btn-danger { background: #e11d48; color: white; border: none; padding: 6px 14px; border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 0.75rem; }
+        .btn-danger:hover { background: #be123c; }
+        .btn-icon { background: #0ea5e9; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; transition: 0.2s; }
+        .btn-icon:hover { background: #0284c7; transform: scale(1.1); }
+        .btn-icon.delete { background: #e11d48; }
+        .btn-icon.delete:hover { background: #be123c; }
+        .btn-icon.image { background: #8b5cf6; }
+        .btn-icon.image:hover { background: #7c3aed; }
+        .btn-sm { padding: 4px 12px; font-size: 0.75rem; border-radius: 20px; }
+        .btn-stock { background: #eab308; color: #0b2d4e; border: none; padding: 8px 18px; border-radius: 40px; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; white-space: nowrap; }
+        .btn-stock:hover { background: #ca9a04; }
+        .btn-clear-filter { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 18px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: #0b2d4e; white-space: nowrap; }
+        .btn-clear-filter:hover { background: #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; padding: 10px 8px; background: #f1f5f9; color: #0b2d4e; font-weight: 700; border-bottom: 2px solid #cbd5e1; white-space: nowrap; }
+        th .th-content { display: flex; flex-direction: column; gap: 4px; }
+        th .th-content span { display: flex; align-items: center; gap: 4px; cursor: pointer; user-select: none; white-space: nowrap; }
+        th .th-content span i { font-size: 0.65rem; color: #94a3b8; }
+        th .th-content input { padding: 4px 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.7rem; width: 100%; min-width: 70px; }
+        td { padding: 10px 8px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        tr:hover td { background: #f8fafc; }
+        .total-row { background: #eef2ff; font-weight: 700; color: #0b2d4e; }
+        .total-row td { padding: 12px 8px; border-bottom: 2px solid #cbd5e1; }
+        .login-container { max-width: 480px; margin: 40px auto; padding: 32px; background: white; border-radius: 32px; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: #1e293b; font-size: 0.9rem; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 16px; border-radius: 16px; border: 1px solid #cbd5e1; font-size: 1rem; }
+        .hidden { display: none !important; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .small-note { font-size: 0.75rem; opacity: 0.7; margin-top: 4px; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 12px; background: #f8fafc; margin-bottom: 6px; border: 1px solid #e9eef4; }
+        .list-item span { font-size: 0.9rem; font-weight: 500; color: #1e293b; }
+        .inline-form { display: flex; gap: 10px; margin-top: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .inline-form input, .inline-form select { flex: 1; padding: 10px 14px; border-radius: 14px; border: 1px solid #cbd5e1; font-size: 0.9rem; min-width: 120px; }
+        .readonly-badge { font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+        .division-badge { font-size: 0.65rem; background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 20px; font-weight: 600; margin-left: 6px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 16px; }
+        .modal-content { background: white; border-radius: 28px; padding: 28px 32px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { color: #0b2d4e; font-size: 1.4rem; }
+        .modal-close { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #64748b; }
+        .filter-row th { background: #eef2ff; padding: 6px 8px; }
+        .filter-row input { width: 100%; padding: 5px 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.75rem; box-sizing: border-box; }
+        .sortable { cursor: pointer; user-select: none; }
+        .sortable:hover { color: #2563eb; }
+        .sort-icon { margin-left: 4px; font-size: 0.65rem; color: #94a3b8; }
+        .summary-filter-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 18px; }
+        .summary-filter-bar select, .summary-filter-bar input { padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.85rem; min-width: 140px; }
+        .record-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .record-header h4 { margin: 0; }
+        .record-header-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .action-cell { white-space: nowrap; text-align: center; }
+        .sync-indicator { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; background: #1e4a76; padding: 6px 12px; border-radius: 40px; color: #94a3b8; white-space: nowrap; }
+        .sync-indicator.syncing { color: #facc15; }
+        .sync-indicator.success { color: #4ade80; }
+        .sync-indicator.error { color: #f87171; }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 40px; color: white; font-weight: 600; font-size: 0.85rem; z-index: 4000; box-shadow: 0 10px 30px -8px rgba(0,0,0,0.3); animation: slideUp 0.3s ease; max-width: 90vw; text-align: center; }
+        .toast.success { background: #16a34a; }
+        .toast.error { background: #e11d48; }
+        .toast.info { background: #0b2d4e; }
+        @keyframes slideUp { from { bottom: -100px; opacity: 0; } to { bottom: 24px; opacity: 1; } }
+        .detail-card { background: linear-gradient(145deg, #ffffff 0%, #f0f4ff 100%); border-radius: 24px; padding: 28px 30px; box-shadow: 0 12px 40px -10px rgba(11, 45, 78, 0.25); border: 1px solid #dbe7ff; position: relative; overflow: hidden; }
+        .detail-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, #0b2d4e, #eab308, #0ea5e9); }
+        .detail-card .brand-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; padding-bottom: 16px; border-bottom: 2px dashed #cbd5e1; }
+        .detail-card .brand-header .logo-circle { width: 52px; height: 52px; border-radius: 50%; background: #0b2d4e; color: #facc15; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 6px 14px -4px #0b2d4e80; flex-shrink: 0; }
+        .detail-card .brand-header .brand-text h2 { color: #0b2d4e; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.3px; }
+        .detail-card .brand-header .brand-text p { color: #64748b; font-size: 0.8rem; font-weight: 500; margin-top: 2px; }
+        .detail-card .card-title { text-align: center; font-size: 1.1rem; font-weight: 700; color: #0b2d4e; background: #eef2ff; padding: 10px; border-radius: 14px; margin-bottom: 22px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+        .detail-item { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-bottom: 1px solid #e9eef4; }
+        .detail-item.full-width { grid-column: span 2; }
+        .detail-item .label { font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; }
+        .detail-item .value { font-size: 0.95rem; font-weight: 600; color: #1e293b; word-break: break-word; }
+        .detail-item .value.highlight { color: #0b2d4e; font-size: 1.15rem; font-weight: 800; }
+        .detail-item .value.qty-highlight { color: #e11d48; font-size: 1.3rem; font-weight: 800; }
+        .detail-card .card-footer { margin-top: 24px; padding-top: 14px; border-top: 2px dashed #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .detail-card .card-footer .footer-note { font-size: 0.7rem; color: #94a3b8; font-weight: 500; }
+        .detail-card .card-footer .footer-id { font-size: 0.7rem; background: #0b2d4e; color: #facc15; padding: 4px 12px; border-radius: 20px; font-weight: 700; letter-spacing: 0.5px; }
+        .detail-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+        .detail-actions .btn-share { background: #25d366; color: white; border: none; padding: 10px 22px; border-radius: 40px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .detail-actions .btn-copy { background: #0b2d4e; color: white; border: none; padding: 10px 22px; border-radius: 40px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .detail-actions .btn-close-detail { background: #e2e8f0; color: #1e293b; border: none; padding: 10px 22px; border-radius: 40px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+        .table-scroll-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        /* ========== PAGE SIZE SELECT ========== */
+        .page-size-select {
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0b2d4e;
+            cursor: pointer;
+        }
+
+        /* ========== PAGINATION CONTROLS (bottom right) ========== */
+        .pagination-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .pagination-info {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .pagination-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0b2d4e;
+            transition: 0.2s;
+            min-width: 36px;
+            text-align: center;
+        }
+        .page-btn:hover:not(:disabled) { background: #f1f5f9; border-color: #0b2d4e; }
+        .page-btn.active { background: #0b2d4e; color: white; border-color: #0b2d4e; font-weight: 700; }
+        .page-btn:disabled { background: #f8fafc; cursor: not-allowed; color: #cbd5e1; }
+        .page-dots { padding: 0 6px; color: #94a3b8; font-weight: 700; }
+
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            body { padding: 8px; align-items: flex-start; }
+            .app-container { border-radius: 20px; max-width: 100%; }
+            .app-header { padding: 16px 18px; flex-direction: column; align-items: flex-start; gap: 12px; }
+            .header-left h1 { font-size: 1.4rem; }
+            .header-left h2 { font-size: 1rem; }
+            .header-left h3 { font-size: 0.85rem; }
+            .header-right { width: 100%; justify-content: flex-start; gap: 8px; }
+            .user-badge, .btn-main-app, .btn-logout { font-size: 0.75rem; padding: 6px 12px; }
+            .sync-indicator { font-size: 0.65rem; padding: 4px 10px; }
+            .main-panel { flex-direction: column; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 12px; gap: 8px; border-right: none; border-bottom: 1px solid #e2e8f0; -webkit-overflow-scrolling: touch; }
+            .sidebar-tab { flex-shrink: 0; padding: 10px 16px; font-size: 0.85rem; }
+            .sidebar-tab i { width: auto; }
+            .content-area { padding: 18px 14px; gap: 16px; }
+            .page-title { font-size: 1.2rem; padding-left: 12px; border-left-width: 4px; }
+            .card { padding: 16px 12px; border-radius: 18px; }
+            .grid-2 { grid-template-columns: 1fr; gap: 12px; }
+            .record-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .record-header-right { width: 100%; }
+            .btn-stock { padding: 6px 14px; font-size: 0.75rem; }
+            .detail-grid { grid-template-columns: 1fr; }
+            .detail-item.full-width { grid-column: span 1; }
+            .modal-content { padding: 20px 16px; border-radius: 20px; }
+            .modal-header h3 { font-size: 1.1rem; }
+            .detail-card { padding: 20px 16px; }
+            .detail-card .brand-header .logo-circle { width: 42px; height: 42px; font-size: 1.1rem; }
+            .detail-card .brand-header .brand-text h2 { font-size: 1.05rem; }
+            .detail-card .brand-header .brand-text p { font-size: 0.7rem; }
+            .detail-actions { flex-direction: column; }
+            .detail-actions button { width: 100%; justify-content: center; }
+            table { font-size: 0.75rem; }
+            th, td { padding: 8px 6px; }
+            .pagination-bar { flex-direction: column; align-items: stretch; }
+            .pagination-controls { margin-left: 0; justify-content: center; }
+            .page-btn { padding: 5px 10px; font-size: 0.7rem; min-width: 32px; }
+        }
+
+        @media (max-width: 600px) {
+            .login-container { padding: 24px 18px; margin: 20px auto; }
+            .login-container h2 { font-size: 1.3rem !important; }
+            .form-group input, .form-group select { padding: 10px 14px; font-size: 0.9rem; }
+            .page-title { font-size: 1.1rem; }
+            .btn-primary { padding: 10px 18px; font-size: 0.85rem; }
+            .page-size-select { font-size: 0.7rem; padding: 5px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">Created By: Mian Noman Ali Wahidi BNB Division</div>
+
+    <div id="app" class="app-container">
+        <!-- Login view -->
+        <div id="loginView" class="login-container">
+            <div style="text-align: center; margin-bottom: 28px;">
+                <h2 style="color: #0b2d4e; font-weight: 800;">Dawat e Islami Trust</h2>
+                <p style="color: #334155;">Donation Box Department — Workshop Software</p>
+            </div>
+            <div class="form-group">
+                <label>User ID</label>
+                <input type="text" id="loginId" placeholder="Enter User ID" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter Password" autocomplete="off">
+            </div>
+            <button class="btn-primary" style="width: 100%; padding: 14px;" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </div>
+
+        <!-- Dashboard view -->
+        <div id="dashboardView" class="hidden" style="display: flex; flex-direction: column; width: 100%;">
+            <div class="app-header">
+                <div class="header-left">
+                    <h1>Dawat e Islami Trust</h1>
+                    <h2>Donation Box Department</h2>
+                    <h3>Workshop Software</h3>
+                </div>
+                <div class="header-right">
+                    <div class="sync-indicator" id="syncIndicator">
+                        <i class="fas fa-circle"></i>
+                        <span id="syncText">Ready</span>
+                    </div>
+                    <div class="user-badge">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userDisplay">Super Admin</span>
+                    </div>
+                    <button class="btn-main-app" id="mainAppBtn" onclick="goToMainApp()">
+                        <i class="fas fa-home"></i> Main App
+                    </button>
+                    <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </div>
+
+            <div class="main-panel">
+                <div class="sidebar">
+                    <div class="sidebar-tab active" data-tab="summary"><i class="fas fa-chart-pie"></i> Summary</div>
+                    <div class="sidebar-tab" data-tab="receiving"><i class="fas fa-truck-loading"></i> Receiving</div>
+                    <div class="sidebar-tab" data-tab="workshop"><i class="fas fa-tools"></i> Workshop</div>
+                    <div class="sidebar-tab" data-tab="items"><i class="fas fa-boxes"></i> Items & Offices</div>
+                </div>
+
+                <div class="content-area" id="contentArea">
+                    <!-- Summary tab -->
+                    <div id="tab-summary" class="tab-content">
+                        <div class="page-title">Summary Dashboard</div>
+                        <div class="card">
+                            <div class="summary-filter-bar">
+                                <input type="date" id="sumDateStart" placeholder="Date Start">
+                                <input type="date" id="sumDateEnd" placeholder="Date End">
+                                <select id="sumDivision">
+                                    <option value="">All Divisions</option>
+                                    <option value="Hyderabad City">Hyderabad City</option>
+                                    <option value="Hyderabad Division">Hyderabad Division</option>
+                                    <option value="Banbhore Division">Banbhore Division</option>
+                                    <option value="Mirpurkhas Division">Mirpurkhas Division</option>
+                                    <option value="Nawabshah Division">Nawabshah Division</option>
+                                    <option value="Sukkur Division">Sukkur Division</option>
+                                    <option value="Larkana Division">Larkana Division</option>
+                                    <option value="Jacobabad Division">Jacobabad Division</option>
+                                </select>
+                                <select id="sumOffice"><option value="">All Offices</option></select>
+                                <select id="sumZimedar"><option value="">All Repairing Zimedar</option></select>
+                                <select id="sumItem"><option value="">All Items</option></select>
+                                <input type="text" id="sumReceiver" placeholder="Receiver (Ajeer Code or Name)">
+                                <input type="text" id="sumBoxZimedar" placeholder="Box Zimedar">
+                                <button class="btn-primary" id="applySummaryFilter">Apply</button>
+                                <button class="btn-clear-filter" id="clearSummaryFilter">Clear</button>
+                            </div>
+                            <div class="table-scroll-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Item Name</th>
+                                            <th>Receive QTY</th>
+                                            <th>Repair QTY</th>
+                                            <th>Scrape QTY</th>
+                                            <th>Remaining Stock QTY</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="summaryTbody"></tbody>
+                                    <tfoot id="summaryTfoot"></tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Receiving tab -->
+                    <div id="tab-receiving" class="tab-content hidden">
+                        <div class="page-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <span>Receiving Form</span>
+                            <button class="btn-stock" id="receivingStockBtn"><i class="fas fa-warehouse"></i> Show Stock</button>
+                        </div>
+                        <div class="card">
+                            <form id="receivingForm">
+                                <input type="hidden" id="recEditId" value="">
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Date</label>
+                                        <input type="date" id="recDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Day (auto)</label>
+                                        <input type="text" id="recDay" readonly>
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Office Name</label>
+                                        <select id="recOffice" required><option value="">Select Office</option></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Item Name</label>
+                                        <select id="recItem" required><option value="">Select Item</option></select>
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>QTY</label>
+                                        <input type="number" id="recQty" min="1" value="1" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Receiver Ajeer Code</label>
+                                        <input type="text" id="recAjeerCode" placeholder="Ajeer Code">
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Receiver Name</label>
+                                        <input type="text" id="recReceiverName" placeholder="Full name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Box Zimedar Ajeer Code</label>
+                                        <input type="text" id="recBoxZimedarAjeerCode" placeholder="Box Zimedar Ajeer Code">
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Box Zimedar Name</label>
+                                        <input type="text" id="recBoxZimedarName" placeholder="Box Zimedar Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Remarks</label>
+                                        <input type="text" id="recRemarks" placeholder="optional">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary" id="recSubmitBtn">Add Receiving Entry</button>
+                                <button type="button" class="btn-secondary" id="recCancelEdit" style="display:none; margin-left:8px;">Cancel Edit</button>
+                            </form>
+                        </div>
+
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="record-header">
+                                <h4>Receiving Records</h4>
+                                <div class="record-header-right">
+                                    <select class="page-size-select" id="recPageSize" onchange="recCurrentPage=1; renderReceivingRows()">
+                                        <option value="20" selected>20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="200">200</option>
+                                        <option value="500">500</option>
+                                    </select>
+                                    <button class="btn-clear-filter" id="clearReceivingFilter">Clear Filters</button>
+                                </div>
+                            </div>
+                            <div class="table-scroll-container">
+                                <table id="receivingTable">
+                                    <thead>
+                                        <tr id="receivingHeaderRow"></tr>
+                                        <tr class="filter-row" id="receivingFilterRow"></tr>
+                                        <tr class="total-row" id="receivingTotalRow"></tr>
+                                    </thead>
+                                    <tbody id="receivingTbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-bar">
+                                <div class="pagination-info" id="recPageInfo">Showing 0 of 0 entries</div>
+                                <div class="pagination-controls" id="recPaginationControls"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Workshop tab -->
+                    <div id="tab-workshop" class="tab-content hidden">
+                        <div class="page-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <span>Workshop Entry</span>
+                            <button class="btn-stock" id="workshopStockBtn"><i class="fas fa-warehouse"></i> Show Stock</button>
+                        </div>
+                        <div class="card">
+                            <form id="workshopForm">
+                                <input type="hidden" id="workEditId" value="">
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Action</label>
+                                        <select id="workType" required>
+                                            <option value="Repair">Repair</option>
+                                            <option value="Scrape">Scrape</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Date</label>
+                                        <input type="date" id="workDate" required>
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Day (auto)</label>
+                                        <input type="text" id="workDay" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Office Name</label>
+                                        <select id="workOffice" required><option value="">Select Office</option></select>
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Item Name</label>
+                                        <select id="workItem" required><option value="">Select Item</option></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>QTY</label>
+                                        <input type="number" id="workQty" min="1" value="1" required>
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Repairing Zimedar</label>
+                                        <select id="workZimedar" required><option value="">Select Repairing Zimedar</option></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Remarks</label>
+                                        <input type="text" id="workRemarks" placeholder="optional">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary" id="workSubmitBtn">Add Workshop Entry</button>
+                                <button type="button" class="btn-secondary" id="workCancelEdit" style="display:none; margin-left:8px;">Cancel Edit</button>
+                            </form>
+                        </div>
+
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="record-header">
+                                <h4>Workshop Records</h4>
+                                <div class="record-header-right">
+                                    <select class="page-size-select" id="workPageSize" onchange="workCurrentPage=1; renderWorkshopRows()">
+                                        <option value="20" selected>20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="200">200</option>
+                                        <option value="500">500</option>
+                                    </select>
+                                    <button class="btn-clear-filter" id="clearWorkshopFilter">Clear Filters</button>
+                                </div>
+                            </div>
+                            <div class="table-scroll-container">
+                                <table id="workshopTable">
+                                    <thead>
+                                        <tr id="workshopHeaderRow"></tr>
+                                        <tr class="filter-row" id="workshopFilterRow"></tr>
+                                        <tr class="total-row" id="workshopTotalRow"></tr>
+                                    </thead>
+                                    <tbody id="workshopTbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-bar">
+                                <div class="pagination-info" id="workPageInfo">Showing 0 of 0 entries</div>
+                                <div class="pagination-controls" id="workPaginationControls"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items & Offices tab -->
+                    <div id="tab-items" class="tab-content hidden">
+                        <div class="page-title">Items, Offices & Repairing Zimedaran</div>
+                        <div id="adminNotice" class="small-note" style="margin-bottom: 12px; color: #92400e; background: #fef3c7; padding: 10px 16px; border-radius: 14px;">
+                            <i class="fas fa-lock"></i> Only Super Admin can add or delete entries. Other users have view-only access.
+                        </div>
+
+                        <div class="grid-2" style="gap: 24px;">
+                            <div class="card">
+                                <h4 style="color: #0b2d4e; margin-bottom: 12px;">Offices (Division-wise)</h4>
+                                <div id="officesList"></div>
+                                <div class="inline-form" id="officeAddForm">
+                                    <input type="text" id="newOfficeName" placeholder="New office name">
+                                    <select id="newOfficeDivision" required>
+                                        <option value="">Select Division</option>
+                                        <option value="Hyderabad City">Hyderabad City</option>
+                                        <option value="Hyderabad Division">Hyderabad Division</option>
+                                        <option value="Banbhore Division">Banbhore Division</option>
+                                        <option value="Mirpurkhas Division">Mirpurkhas Division</option>
+                                        <option value="Nawabshah Division">Nawabshah Division</option>
+                                        <option value="Sukkur Division">Sukkur Division</option>
+                                        <option value="Larkana Division">Larkana Division</option>
+                                        <option value="Jacobabad Division">Jacobabad Division</option>
+                                    </select>
+                                    <button class="btn-primary btn-sm" id="addOfficeBtn">Add</button>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <h4 style="color: #0b2d4e; margin-bottom: 12px;">Items</h4>
+                                <div id="itemsList"></div>
+                                <div class="inline-form" id="itemAddForm">
+                                    <input type="text" id="newItemName" placeholder="New item name">
+                                    <button class="btn-primary btn-sm" id="addItemBtn">Add</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="margin-top: 20px;">
+                            <h4 style="color: #0b2d4e; margin-bottom: 12px;">Repairing Zimedaran (Division-wise)</h4>
+                            <div id="zimedaranList"></div>
+                            <div class="inline-form" id="zimedarAddForm">
+                                <input type="text" id="newZimedarName" placeholder="New repairing zimedar name">
+                                <select id="newZimedarDivision" required>
+                                    <option value="">Select Division</option>
+                                    <option value="Hyderabad City">Hyderabad City</option>
+                                    <option value="Hyderabad Division">Hyderabad Division</option>
+                                    <option value="Banbhore Division">Banbhore Division</option>
+                                    <option value="Mirpurkhas Division">Mirpurkhas Division</option>
+                                    <option value="Nawabshah Division">Nawabshah Division</option>
+                                    <option value="Sukkur Division">Sukkur Division</option>
+                                    <option value="Larkana Division">Larkana Division</option>
+                                    <option value="Jacobabad Division">Jacobabad Division</option>
+                                </select>
+                                <button class="btn-primary btn-sm" id="addZimedarBtn">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyqi4cPz-1HV9ySvXvD6i5uePU8UnNC8ffbuWfiz7gKEM0U4itCCfB3QrtPRN5Xyc_v/exec';
+        const MAIN_APP_URL = 'https://hjkasdernm.github.io/Inventory-System/';
+
+        // SSO check (Main App se aaya?)
+        (function checkSSO() {
+            const params = new URLSearchParams(window.location.search);
+            const ssoId = params.get('sso_id');
+            const ssoRole = params.get('sso_role');
+            const ssoName = params.get('sso_name');
+            if (ssoId && ssoRole && ssoName) {
+                const ssoUser = {
+                    id: ssoId,
+                    role: ssoRole === 'admin' ? 'superadmin' : 'division',
+                    name: ssoName
+                };
+                localStorage.setItem('workshop_current_user', JSON.stringify(ssoUser));
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        })();
+
+        const CACHE_KEY = 'dawatWorkshopCache';
+        let pendingSyncCount = 0;
+        let isFetching = false;
+
+        // Pagination state
+        let recCurrentPage = 1;
+        let workCurrentPage = 1;
+
+        // ============================================================
+        // DATE FORMATTING — Fix timezone issue
+        // ============================================================
+        function formatDateForInput(val) {
+            if (!val) return '';
+            if (typeof val === 'string') {
+                if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+                if (val.includes('T')) {
+                    try {
+                        const d = new Date(val);
+                        const utcMs = d.getTime();
+                        const pakistanMs = utcMs + (5 * 60 * 60 * 1000);
+                        const pakistanDate = new Date(pakistanMs);
+                        const yyyy = pakistanDate.getUTCFullYear();
+                        const mm = String(pakistanDate.getUTCMonth() + 1).padStart(2, '0');
+                        const dd = String(pakistanDate.getUTCDate()).padStart(2, '0');
+                        return `${yyyy}-${mm}-${dd}`;
+                    } catch (e) { return val.split('T')[0]; }
+                }
+                if (/^\d{4}-\d{2}-\d{2}/.test(val)) return val.substring(0, 10);
+                return val;
+            }
+            try {
+                const d = new Date(val);
+                if (isNaN(d.getTime())) return '';
+                const utcMs = d.getTime();
+                const pakistanMs = utcMs + (5 * 60 * 60 * 1000);
+                const pakistanDate = new Date(pakistanMs);
+                const yyyy = pakistanDate.getUTCFullYear();
+                const mm = String(pakistanDate.getUTCMonth() + 1).padStart(2, '0');
+                const dd = String(pakistanDate.getUTCDate()).padStart(2, '0');
+                return `${yyyy}-${mm}-${dd}`;
+            } catch (e) { return String(val); }
+        }
+
+        function getDayName(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const parts = dateStr.split('-');
+                const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                return d.toLocaleDateString('en-US', { weekday: 'long' });
+            } catch (e) { return ''; }
+        }
+
+        function saveCacheToLocal() {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify({
+                    receiving: receivingRecords, workshop: workshopRecords,
+                    offices: officesList, items: itemsList, zimedaran: zimedaranList,
+                    timestamp: Date.now()
+                }));
+            } catch (e) {}
+        }
+
+        function loadCacheFromLocal() {
+            try {
+                const raw = localStorage.getItem(CACHE_KEY);
+                if (!raw) return false;
+                const cache = JSON.parse(raw);
+                receivingRecords = cache.receiving || [];
+                workshopRecords = cache.workshop || [];
+                officesList = cache.offices || [];
+                itemsList = cache.items || [];
+                zimedaranList = cache.zimedaran || [];
+                receivingRecords.forEach(r => {
+                    r.qty = Number(r.qty) || 0;
+                    r.date = formatDateForInput(r.date);
+                });
+                workshopRecords.forEach(w => {
+                    w.qty = Number(w.qty) || 0;
+                    w.date = formatDateForInput(w.date);
+                });
+                return true;
+            } catch (e) { return false; }
+        }
+
+        async function apiCall(action, params = {}) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action, ...params }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                redirect: 'follow'
+            });
+            const result = await response.json();
+            if (!result.success) throw new Error(result.error || 'API Error');
+            return result.data;
+        }
+
+        function apiCallBackground(action, params = {}) {
+            pendingSyncCount++;
+            updateSyncIndicator('syncing', 'Saving...');
+            return apiCall(action, params)
+                .then(result => {
+                    pendingSyncCount--;
+                    if (pendingSyncCount === 0) updateSyncIndicator('success', 'Saved');
+                    return result;
+                })
+                .catch(err => {
+                    pendingSyncCount--;
+                    updateSyncIndicator('error', 'Sync error');
+                    showToast('Background sync failed: ' + err.message, 'error');
+                    throw err;
+                });
+        }
+
+        function updateSyncIndicator(status, text) {
+            const el = document.getElementById('syncIndicator');
+            const txt = document.getElementById('syncText');
+            if (!el || !txt) return;
+            el.className = 'sync-indicator ' + status;
+            txt.textContent = text;
+            if (status === 'success') {
+                setTimeout(() => {
+                    if (pendingSyncCount === 0) {
+                        el.className = 'sync-indicator';
+                        txt.textContent = 'Ready';
+                    }
+                }, 2000);
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            document.body.insertAdjacentHTML('beforeend', `<div class="toast ${type}">${message}</div>`);
+            setTimeout(() => {
+                const t = document.querySelector('.toast');
+                if (t) t.remove();
+            }, 2500);
+        }
+
+        function generateId(prefix) {
+            return `${prefix}-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+        }
+
+        let officesList = [];
+        let itemsList = [];
+        let zimedaranList = [];
+        let receivingRecords = [];
+        let workshopRecords = [];
+
+        const loginView = document.getElementById('loginView');
+        const dashboardView = document.getElementById('dashboardView');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userDisplay = document.getElementById('userDisplay');
+        const adminNotice = document.getElementById('adminNotice');
+
+        let currentUser = JSON.parse(localStorage.getItem('workshop_current_user')) || null;
+
+        function isSuperAdmin() { return currentUser && (currentUser.role === 'superadmin' || currentUser.role === 'admin'); }
+        function getCurrentDivision() {
+            if (!currentUser) return null;
+            if (currentUser.role === 'superadmin' || currentUser.role === 'admin') return null;
+            return currentUser.name;
+        }
+        function getVisibleOffices() {
+            const div = getCurrentDivision();
+            if (!div) return officesList;
+            return officesList.filter(o => o.division === div);
+        }
+        function getVisibleZimedaran() {
+            const div = getCurrentDivision();
+            if (!div) return zimedaranList;
+            return zimedaranList.filter(z => z.division === div);
+        }
+        function getVisibleOfficeNames() {
+            return getVisibleOffices().map(o => o.name);
+        }
+
+        // ============ LOGIN ============
+        loginBtn.addEventListener('click', async () => {
+            const id = document.getElementById('loginId').value.trim();
+            const pwd = document.getElementById('loginPassword').value.trim();
+            if (!id || !pwd) return showToast('Please enter User ID and Password', 'error');
+
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+            try {
+                const user = await apiCall('login', { id, password: pwd });
+                if (!user) {
+                    showToast('Invalid credentials!', 'error');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                    return;
+                }
+
+                currentUser = user;
+                localStorage.setItem('workshop_current_user', JSON.stringify(currentUser));
+
+                loginView.classList.add('hidden');
+                dashboardView.classList.remove('hidden');
+                userDisplay.textContent = currentUser.name;
+
+                const adminElements = document.querySelectorAll('#officeAddForm, #itemAddForm, #zimedarAddForm');
+                adminElements.forEach(el => { el.style.display = isSuperAdmin() ? 'flex' : 'none'; });
+                adminNotice.style.display = isSuperAdmin() ? 'block' : 'none';
+
+                if (loadCacheFromLocal()) {
+                    renderAllUI();
+                }
+
+                try {
+                    await fetchFreshData();
+                } catch (e) {
+                    console.error('Fresh fetch failed:', e);
+                }
+
+                showToast(`Welcome, ${currentUser.name}!`, 'success');
+            } catch (err) {
+                showToast('Login failed: ' + err.message, 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            }
+        });
+
+        document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginBtn.click();
+        });
+
+        function checkAutoLogin() {
+            if (currentUser) {
+                loginView.classList.add('hidden');
+                dashboardView.classList.remove('hidden');
+                userDisplay.textContent = currentUser.name;
+
+                const adminElements = document.querySelectorAll('#officeAddForm, #itemAddForm, #zimedarAddForm');
+                adminElements.forEach(el => { el.style.display = isSuperAdmin() ? 'flex' : 'none'; });
+                adminNotice.style.display = isSuperAdmin() ? 'block' : 'none';
+
+                if (loadCacheFromLocal()) {
+                    renderAllUI();
+                }
+
+                fetchFreshData();
+                return true;
+            }
+            return false;
+        }
+
+        function goToMainApp() {
+            if (!currentUser) { alert('Pehle login karein'); return; }
+            window.location.href = MAIN_APP_URL;
+        }
+
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            localStorage.removeItem('workshop_current_user');
+            dashboardView.classList.add('hidden');
+            loginView.classList.remove('hidden');
+            document.getElementById('loginId').value = '';
+            document.getElementById('loginPassword').value = '';
+            officesList = []; itemsList = []; zimedaranList = [];
+            receivingRecords = []; workshopRecords = [];
+        });
+
+        // ============ FETCH FRESH DATA ============
+        async function fetchFreshData() {
+            if (isFetching) return;
+            isFetching = true;
+            updateSyncIndicator('syncing', 'Fetching...');
+            try {
+                const data = await apiCall('getAll');
+                receivingRecords = (data.receiving || []).map(r => {
+                    r.qty = Number(r.qty) || 0;
+                    r.date = formatDateForInput(r.date);
+                    return r;
+                });
+                workshopRecords = (data.workshop || []).map(w => {
+                    w.qty = Number(w.qty) || 0;
+                    w.date = formatDateForInput(w.date);
+                    return w;
+                });
+                officesList = data.offices || [];
+                itemsList = data.items || [];
+                zimedaranList = data.zimedaran || [];
+
+                saveCacheToLocal();
+                renderAllUI();
+                updateSyncIndicator('success', 'Updated');
+            } catch (err) {
+                updateSyncIndicator('error', 'Fetch error');
+                showToast('Fetch failed: ' + err.message, 'error');
+            } finally {
+                isFetching = false;
+            }
+        }
+
+        function renderAllUI() {
+            populateDropdowns();
+            renderOfficesList();
+            renderItemsList();
+            renderZimedaranList();
+            buildReceivingTable();
+            buildWorkshopTable();
+            buildSummaryFilters();
+            renderSummaryTable();
+        }
+
+        // ============ TAB SWITCHING ============
+        document.querySelectorAll('.sidebar-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const tabName = tab.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+                document.getElementById('tab-' + tabName).classList.remove('hidden');
+                if (tabName === 'summary') { buildSummaryFilters(); renderSummaryTable(); }
+                if (tabName === 'workshop') refreshWorkshopZimedarDropdown();
+            });
+        });
+
+        // ============ POPULATE DROPDOWNS ============
+        function populateDropdowns() {
+            const recOffice = document.getElementById('recOffice');
+            const recItem = document.getElementById('recItem');
+            const workOffice = document.getElementById('workOffice');
+            const workItem = document.getElementById('workItem');
+
+            const recOfficeVal = recOffice.value;
+            const recItemVal = recItem.value;
+            const workOfficeVal = workOffice.value;
+            const workItemVal = workItem.value;
+
+            const officeNames = getVisibleOfficeNames();
+
+            recOffice.innerHTML = '<option value="">Select Office</option>';
+            officeNames.forEach(o => { const opt = document.createElement('option'); opt.value = o; opt.textContent = o; recOffice.appendChild(opt); });
+
+            recItem.innerHTML = '<option value="">Select Item</option>';
+            itemsList.forEach(i => { const opt = document.createElement('option'); opt.value = i.name; opt.textContent = i.name; recItem.appendChild(opt); });
+
+            workOffice.innerHTML = '<option value="">Select Office</option>';
+            officeNames.forEach(o => { const opt = document.createElement('option'); opt.value = o; opt.textContent = o; workOffice.appendChild(opt); });
+
+            workItem.innerHTML = '<option value="">Select Item</option>';
+            itemsList.forEach(i => { const opt = document.createElement('option'); opt.value = i.name; opt.textContent = i.name; workItem.appendChild(opt); });
+
+            if (officeNames.includes(recOfficeVal)) recOffice.value = recOfficeVal;
+            if (itemsList.some(i => i.name === recItemVal)) recItem.value = recItemVal;
+            if (officeNames.includes(workOfficeVal)) workOffice.value = workOfficeVal;
+            if (itemsList.some(i => i.name === workItemVal)) workItem.value = workItemVal;
+
+            refreshWorkshopZimedarDropdown();
+        }
+
+        function refreshWorkshopZimedarDropdown() {
+            const workZimedar = document.getElementById('workZimedar');
+            const visible = getVisibleZimedaran();
+            const currentVal = workZimedar.value;
+            workZimedar.innerHTML = '<option value="">Select Repairing Zimedar</option>';
+            visible.forEach(z => {
+                const opt = document.createElement('option');
+                opt.value = z.name;
+                opt.textContent = isSuperAdmin() ? `${z.name} (${z.division})` : z.name;
+                workZimedar.appendChild(opt);
+            });
+            if (visible.some(z => z.name === currentVal)) workZimedar.value = currentVal;
+            if (visible.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No zimedaran assigned to your division';
+                opt.disabled = true;
+                workZimedar.appendChild(opt);
+            }
+        }
+
+        // ============ RENDER LISTS ============
+        function renderOfficesList() {
+            const container = document.getElementById('officesList');
+            container.innerHTML = '';
+            officesList.forEach((office) => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `<span>${office.name} <span class="division-badge">${office.division}</span></span>`;
+                if (isSuperAdmin()) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-danger btn-sm';
+                    btn.textContent = 'Delete';
+                    btn.onclick = () => {
+                        if (!confirm(`Delete office "${office.name}" (${office.division})?`)) return;
+                        officesList = officesList.filter(o => String(o.id) !== String(office.id));
+                        saveCacheToLocal(); renderOfficesList(); populateDropdowns();
+                        showToast('Office deleted', 'success');
+                        apiCallBackground('deleteOffice', { id: office.id }).catch(() => fetchFreshData());
+                    };
+                    div.appendChild(btn);
+                } else {
+                    const badge = document.createElement('span');
+                    badge.className = 'readonly-badge';
+                    badge.textContent = 'view only';
+                    div.appendChild(badge);
+                }
+                container.appendChild(div);
+            });
+        }
+
+        function renderItemsList() {
+            const container = document.getElementById('itemsList');
+            container.innerHTML = '';
+            itemsList.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `<span>${item.name}</span>`;
+                if (isSuperAdmin()) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-danger btn-sm';
+                    btn.textContent = 'Delete';
+                    btn.onclick = () => {
+                        if (!confirm(`Delete item "${item.name}"?`)) return;
+                        itemsList = itemsList.filter(i => String(i.id) !== String(item.id));
+                        saveCacheToLocal(); renderItemsList(); populateDropdowns();
+                        showToast('Item deleted', 'success');
+                        apiCallBackground('deleteItem', { id: item.id }).catch(() => fetchFreshData());
+                    };
+                    div.appendChild(btn);
+                } else {
+                    const badge = document.createElement('span');
+                    badge.className = 'readonly-badge';
+                    badge.textContent = 'view only';
+                    div.appendChild(badge);
+                }
+                container.appendChild(div);
+            });
+        }
+
+        function renderZimedaranList() {
+            const container = document.getElementById('zimedaranList');
+            container.innerHTML = '';
+            zimedaranList.forEach((zimedar) => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `<span>${zimedar.name} <span class="division-badge">${zimedar.division}</span></span>`;
+                if (isSuperAdmin()) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-danger btn-sm';
+                    btn.textContent = 'Delete';
+                    btn.onclick = () => {
+                        if (!confirm(`Delete zimedar "${zimedar.name}"?`)) return;
+                        zimedaranList = zimedaranList.filter(z => String(z.id) !== String(zimedar.id));
+                        saveCacheToLocal(); renderZimedaranList(); refreshWorkshopZimedarDropdown();
+                        showToast('Zimedar deleted', 'success');
+                        apiCallBackground('deleteZimedar', { id: zimedar.id }).catch(() => fetchFreshData());
+                    };
+                    div.appendChild(btn);
+                } else {
+                    const badge = document.createElement('span');
+                    badge.className = 'readonly-badge';
+                    badge.textContent = 'view only';
+                    div.appendChild(badge);
+                }
+                container.appendChild(div);
+            });
+        }
+
+        // ============ ADD BUTTONS ============
+        document.getElementById('addOfficeBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isSuperAdmin()) return showToast('Only Super Admin', 'error');
+            const nameInput = document.getElementById('newOfficeName');
+            const divSelect = document.getElementById('newOfficeDivision');
+            const name = nameInput.value.trim();
+            const division = divSelect.value;
+            if (!name || !division) return showToast('Enter office name and division', 'error');
+            if (officesList.some(o => o.name === name && o.division === division)) return showToast('Already exists', 'error');
+
+            const newOffice = { id: generateId('OFF'), name, division };
+            officesList.push(newOffice);
+            saveCacheToLocal();
+            nameInput.value = ''; divSelect.value = '';
+            renderOfficesList(); populateDropdowns();
+            showToast('Office added', 'success');
+            apiCallBackground('addOffice', { data: newOffice }).catch(() => fetchFreshData());
+        });
+
+        document.getElementById('addItemBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isSuperAdmin()) return showToast('Only Super Admin', 'error');
+            const input = document.getElementById('newItemName');
+            const name = input.value.trim();
+            if (!name) return showToast('Enter item name', 'error');
+            if (itemsList.some(i => i.name === name)) return showToast('Already exists', 'error');
+
+            const newItem = { id: generateId('ITM'), name };
+            itemsList.push(newItem);
+            saveCacheToLocal();
+            input.value = '';
+            renderItemsList(); populateDropdowns();
+            showToast('Item added', 'success');
+            apiCallBackground('addItem', { data: newItem }).catch(() => fetchFreshData());
+        });
+
+        document.getElementById('addZimedarBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isSuperAdmin()) return showToast('Only Super Admin', 'error');
+            const nameInput = document.getElementById('newZimedarName');
+            const divisionSelect = document.getElementById('newZimedarDivision');
+            const name = nameInput.value.trim();
+            const division = divisionSelect.value;
+            if (!name || !division) return showToast('Enter name and division', 'error');
+            if (zimedaranList.some(z => z.name === name && z.division === division)) return showToast('Already exists', 'error');
+
+            const newZimedar = { id: generateId('ZMD'), name, division };
+            zimedaranList.push(newZimedar);
+            saveCacheToLocal();
+            nameInput.value = ''; divisionSelect.value = '';
+            renderZimedaranList(); refreshWorkshopZimedarDropdown();
+            showToast('Zimedar added', 'success');
+            apiCallBackground('addZimedar', { data: newZimedar }).catch(() => fetchFreshData());
+        });
+
+        // ============ RECEIVING FORM ============
+        document.getElementById('recDate').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('recDay').value = getDayName(this.value);
+            } else document.getElementById('recDay').value = '';
+        });
+
+        document.getElementById('receivingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('recEditId').value;
+            const data = {
+                id: editId || generateId('RCV'),
+                date: document.getElementById('recDate').value,
+                day: document.getElementById('recDay').value,
+                office: document.getElementById('recOffice').value,
+                item: document.getElementById('recItem').value,
+                qty: parseInt(document.getElementById('recQty').value, 10),
+                ajeerCode: document.getElementById('recAjeerCode').value,
+                receiverName: document.getElementById('recReceiverName').value,
+                boxZimedarAjeerCode: document.getElementById('recBoxZimedarAjeerCode').value,
+                boxZimedarName: document.getElementById('recBoxZimedarName').value,
+                remarks: document.getElementById('recRemarks').value
+            };
+            if (!data.date || !data.office || !data.item || !data.qty) return showToast('Fill required fields', 'error');
+
+            if (editId) {
+                const idx = receivingRecords.findIndex(r => String(r.id) === String(editId));
+                if (idx >= 0) receivingRecords[idx] = data;
+                saveCacheToLocal(); buildReceivingTable(); renderSummaryTable(); resetReceivingForm();
+                showToast('Updated', 'success');
+                apiCallBackground('updateReceiving', { id: editId, data }).catch(() => fetchFreshData());
+            } else {
+                receivingRecords.push(data);
+                saveCacheToLocal(); buildReceivingTable(); renderSummaryTable(); resetReceivingForm();
+                showToast('Added', 'success');
+                apiCallBackground('addReceiving', { data }).catch(() => fetchFreshData());
+            }
+        });
+
+        function resetReceivingForm() {
+            document.getElementById('recEditId').value = '';
+            document.getElementById('recSubmitBtn').textContent = 'Add Receiving Entry';
+            document.getElementById('recCancelEdit').style.display = 'none';
+            document.getElementById('receivingForm').reset();
+            document.getElementById('recDay').value = '';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('recDate').value = today;
+            document.getElementById('recDate').dispatchEvent(new Event('change'));
+        }
+
+        document.getElementById('recCancelEdit').addEventListener('click', resetReceivingForm);
+
+        // ============ WORKSHOP FORM ============
+        document.getElementById('workDate').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('workDay').value = getDayName(this.value);
+            } else document.getElementById('workDay').value = '';
+        });
+
+        document.getElementById('workshopForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('workEditId').value;
+            const data = {
+                id: editId || generateId('WRK'),
+                type: document.getElementById('workType').value,
+                date: document.getElementById('workDate').value,
+                day: document.getElementById('workDay').value,
+                office: document.getElementById('workOffice').value,
+                item: document.getElementById('workItem').value,
+                qty: parseInt(document.getElementById('workQty').value, 10),
+                zimedar: document.getElementById('workZimedar').value,
+                remarks: document.getElementById('workRemarks').value
+            };
+            if (!data.date || !data.office || !data.item || !data.qty) return showToast('Fill required fields', 'error');
+            if (!data.zimedar) return showToast('Select Repairing Zimedar', 'error');
+
+            if (editId) {
+                const idx = workshopRecords.findIndex(r => String(r.id) === String(editId));
+                if (idx >= 0) workshopRecords[idx] = data;
+                saveCacheToLocal(); buildWorkshopTable(); renderSummaryTable(); resetWorkshopForm();
+                showToast('Updated', 'success');
+                apiCallBackground('updateWorkshop', { id: editId, data }).catch(() => fetchFreshData());
+            } else {
+                workshopRecords.push(data);
+                saveCacheToLocal(); buildWorkshopTable(); renderSummaryTable(); resetWorkshopForm();
+                showToast('Added', 'success');
+                apiCallBackground('addWorkshop', { data }).catch(() => fetchFreshData());
+            }
+        });
+
+        function resetWorkshopForm() {
+            document.getElementById('workEditId').value = '';
+            document.getElementById('workSubmitBtn').textContent = 'Add Workshop Entry';
+            document.getElementById('workCancelEdit').style.display = 'none';
+            document.getElementById('workshopForm').reset();
+            document.getElementById('workDay').value = '';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('workDate').value = today;
+            document.getElementById('workDate').dispatchEvent(new Event('change'));
+            refreshWorkshopZimedarDropdown();
+        }
+
+        document.getElementById('workCancelEdit').addEventListener('click', resetWorkshopForm);
+
+        // ============ RECEIVING TABLE ============
+        let receivingSortField = null;
+        let receivingSortDir = 'asc';
+        let receivingFilters = { date: '', day: '', office: '', item: '', qty: '', ajeerCode: '', receiverName: '', boxZimedarAjeerCode: '', boxZimedarName: '', remarks: '' };
+
+        const receivingColumns = [
+            { key: 'date', label: 'Date' },
+            { key: 'day', label: 'Day' },
+            { key: 'office', label: 'Office' },
+            { key: 'item', label: 'Item' },
+            { key: 'qty', label: 'QTY' },
+            { key: 'ajeerCode', label: 'Receiver Ajeer' },
+            { key: 'receiverName', label: 'Receiver Name' },
+            { key: 'boxZimedarAjeerCode', label: 'Box Zimedar Ajeer Code' },
+            { key: 'boxZimedarName', label: 'Box Zimedar Name' },
+            { key: 'remarks', label: 'Remarks' }
+        ];
+
+        function buildReceivingTable() {
+            buildReceivingHeader();
+            buildReceivingFilters();
+            renderReceivingRows();
+        }
+
+        function buildReceivingHeader() {
+            const headerRow = document.getElementById('receivingHeaderRow');
+            headerRow.innerHTML = '';
+            receivingColumns.forEach(col => {
+                const th = document.createElement('th');
+                const div = document.createElement('div');
+                div.className = 'th-content';
+                const span = document.createElement('span');
+                span.className = 'sortable';
+                span.innerHTML = `${col.label} <i class="fas fa-sort sort-icon"></i>`;
+                span.onclick = () => {
+                    if (receivingSortField === col.key) receivingSortDir = receivingSortDir === 'asc' ? 'desc' : 'asc';
+                    else { receivingSortField = col.key; receivingSortDir = 'asc'; }
+                    renderReceivingRows();
+                };
+                div.appendChild(span);
+                th.appendChild(div);
+                headerRow.appendChild(th);
+            });
+            const thAct = document.createElement('th');
+            thAct.textContent = 'Actions';
+            thAct.style.textAlign = 'center';
+            headerRow.appendChild(thAct);
+        }
+
+        function buildReceivingFilters() {
+            const filterRow = document.getElementById('receivingFilterRow');
+            filterRow.innerHTML = '';
+            receivingColumns.forEach(col => {
+                const th = document.createElement('th');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Filter...';
+                input.value = receivingFilters[col.key] || '';
+                input.oninput = (e) => {
+                    receivingFilters[col.key] = e.target.value;
+                    recCurrentPage = 1;
+                    renderReceivingRows();
+                };
+                th.appendChild(input);
+                filterRow.appendChild(th);
+            });
+            const thAct = document.createElement('th');
+            filterRow.appendChild(thAct);
+        }
+
+        function getFilteredReceivingData() {
+            let data = [...receivingRecords];
+            const div = getCurrentDivision();
+            if (div) {
+                data = data.filter(r => {
+                    const officeObj = officesList.find(o => o.name === r.office);
+                    return officeObj && officeObj.division === div;
+                });
+            }
+            receivingColumns.forEach(col => {
+                const f = (receivingFilters[col.key] || '').toLowerCase();
+                if (f) {
+                    data = data.filter(row => String(row[col.key] || '').toLowerCase().includes(f));
+                }
+            });
+            return data;
+        }
+
+        function renderReceivingRows() {
+            let data = getFilteredReceivingData();
+            if (receivingSortField) {
+                data.sort((a, b) => {
+                    let vA = a[receivingSortField] || '';
+                    let vB = b[receivingSortField] || '';
+                    if (receivingSortField === 'qty') {
+                        vA = Number(vA) || 0; vB = Number(vB) || 0;
+                        return receivingSortDir === 'asc' ? vA - vB : vB - vA;
+                    }
+                    vA = String(vA).toLowerCase(); vB = String(vB).toLowerCase();
+                    if (vA < vB) return receivingSortDir === 'asc' ? -1 : 1;
+                    if (vA > vB) return receivingSortDir === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            const totalCount = data.length;
+            const pageSize = parseInt(document.getElementById('recPageSize').value) || 20;
+            const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+            if (recCurrentPage > totalPages) recCurrentPage = totalPages;
+            const startIdx = (recCurrentPage - 1) * pageSize;
+            const pageData = data.slice(startIdx, startIdx + pageSize);
+
+            const tbody = document.getElementById('receivingTbody');
+            tbody.innerHTML = '';
+            pageData.forEach(rec => {
+                const tr = document.createElement('tr');
+                receivingColumns.forEach(col => {
+                    const td = document.createElement('td');
+                    td.textContent = rec[col.key] !== undefined ? rec[col.key] : '';
+                    tr.appendChild(td);
+                });
+                const actionTd = document.createElement('td');
+                actionTd.className = 'action-cell';
+                actionTd.innerHTML = `
+                    <button class="btn-icon image" onclick="showReceivingDetail('${rec.id}')" title="Share"><i class="fas fa-image"></i></button>
+                    <button class="btn-icon" onclick="editReceiving('${rec.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon delete" onclick="deleteReceiving('${rec.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                `;
+                tr.appendChild(actionTd);
+                tbody.appendChild(tr);
+            });
+
+            // Update totals row (all filtered, not just page)
+            const totalQty = data.reduce((sum, r) => sum + (Number(r.qty) || 0), 0);
+            const totalRow = document.getElementById('receivingTotalRow');
+            totalRow.innerHTML = '';
+            receivingColumns.forEach((col, idx) => {
+                const td = document.createElement('td');
+                if (col.key === 'qty') td.textContent = `Total: ${totalQty}`;
+                else if (idx === 0) td.textContent = `Count: ${data.length}`;
+                totalRow.appendChild(td);
+            });
+            totalRow.appendChild(document.createElement('td'));
+
+            // Page info
+            const showingFrom = totalCount === 0 ? 0 : startIdx + 1;
+            const showingTo = Math.min(startIdx + pageSize, totalCount);
+            document.getElementById('recPageInfo').textContent = `Showing ${showingFrom}–${showingTo} of ${totalCount} entries`;
+
+            // Build pagination
+            buildPagination('recPaginationControls', recCurrentPage, totalPages, 'rec');
+        }
+
+        function buildPagination(containerId, currentPage, totalPages, target) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            const prev = document.createElement('button');
+            prev.className = 'page-btn';
+            prev.innerHTML = '‹';
+            prev.disabled = currentPage === 1;
+            prev.onclick = () => { if (target === 'rec') { recCurrentPage--; renderReceivingRows(); } else { workCurrentPage--; renderWorkshopRows(); } };
+            container.appendChild(prev);
+
+            const pages = [];
+            if (totalPages <= 7) {
+                for (let i = 1; i <= totalPages; i++) pages.push(i);
+            } else {
+                if (currentPage <= 4) {
+                    pages.push(1, 2, 3, 4, 5, '...', totalPages);
+                } else if (currentPage >= totalPages - 3) {
+                    pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+                } else {
+                    pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+                }
+            }
+
+            pages.forEach(p => {
+                if (p === '...') {
+                    const span = document.createElement('span');
+                    span.className = 'page-dots';
+                    span.textContent = '...';
+                    container.appendChild(span);
+                } else {
+                    const btn = document.createElement('button');
+                    btn.className = 'page-btn' + (p === currentPage ? ' active' : '');
+                    btn.textContent = p;
+                    btn.onclick = () => { if (target === 'rec') { recCurrentPage = p; renderReceivingRows(); } else { workCurrentPage = p; renderWorkshopRows(); } };
+                    container.appendChild(btn);
+                }
+            });
+
+            const next = document.createElement('button');
+            next.className = 'page-btn';
+            next.innerHTML = '›';
+            next.disabled = currentPage === totalPages;
+            next.onclick = () => { if (target === 'rec') { recCurrentPage++; renderReceivingRows(); } else { workCurrentPage++; renderWorkshopRows(); } };
+            container.appendChild(next);
+        }
+
+        window.editReceiving = function(id) {
+            const rec = receivingRecords.find(r => String(r.id) === String(id));
+            if (!rec) return;
+            document.getElementById('recEditId').value = rec.id;
+            document.getElementById('recDate').value = rec.date;
+            document.getElementById('recDay').value = rec.day;
+            document.getElementById('recOffice').value = rec.office;
+            document.getElementById('recItem').value = rec.item;
+            document.getElementById('recQty').value = rec.qty;
+            document.getElementById('recAjeerCode').value = rec.ajeerCode || '';
+            document.getElementById('recReceiverName').value = rec.receiverName || '';
+            document.getElementById('recBoxZimedarAjeerCode').value = rec.boxZimedarAjeerCode || '';
+            document.getElementById('recBoxZimedarName').value = rec.boxZimedarName || '';
+            document.getElementById('recRemarks').value = rec.remarks || '';
+            document.getElementById('recSubmitBtn').textContent = 'Update Receiving Entry';
+            document.getElementById('recCancelEdit').style.display = 'inline-block';
+            document.querySelector('#tab-receiving .card').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.deleteReceiving = function(id) {
+            if (!confirm('Delete this record?')) return;
+            receivingRecords = receivingRecords.filter(r => String(r.id) !== String(id));
+            saveCacheToLocal(); buildReceivingTable(); renderSummaryTable();
+            showToast('Deleted', 'success');
+            apiCallBackground('deleteReceiving', { id }).catch(() => fetchFreshData());
+        };
+
+        window.showReceivingDetail = function(id) {
+            const rec = receivingRecords.find(r => String(r.id) === String(id));
+            if (!rec) return;
+            const modalHtml = `
+                <div class="modal-overlay" id="detailModalOverlay">
+                    <div class="modal-content" style="max-width: 620px;">
+                        <div class="detail-card">
+                            <div class="brand-header">
+                                <div class="logo-circle"><i class="fas fa-mosque"></i></div>
+                                <div class="brand-text">
+                                    <h2>Dawat e Islami Trust</h2>
+                                    <p>Donation Box Department — Workshop Software</p>
+                                </div>
+                            </div>
+                            <div class="card-title">Receiving Entry Detail</div>
+                            <div class="detail-grid">
+                                <div class="detail-item"><span class="label">Date</span><span class="value">${rec.date || '—'}</span></div>
+                                <div class="detail-item"><span class="label">Day</span><span class="value">${rec.day || '—'}</span></div>
+                                <div class="detail-item"><span class="label">Office</span><span class="value">${rec.office || '—'}</span></div>
+                                <div class="detail-item"><span class="label">Item</span><span class="value">${rec.item || '—'}</span></div>
+                                <div class="detail-item"><span class="label">QTY</span><span class="value qty-highlight">${rec.qty || 0}</span></div>
+                                <div class="detail-item"><span class="label">Receiver Ajeer</span><span class="value">${rec.ajeerCode || '—'}</span></div>
+                                <div class="detail-item"><span class="label">Receiver Name</span><span class="value">${rec.receiverName || '—'}</span></div>
+                                <div class="detail-item"><span class="label">Box Zimedar Ajeer Code</span><span class="value highlight">${rec.boxZimedarAjeerCode || '—'}</span></div>
+                                <div class="detail-item"><span class="label">Box Zimedar Name</span><span class="value highlight">${rec.boxZimedarName || '—'}</span></div>
+                                <div class="detail-item full-width"><span class="label">Remarks</span><span class="value">${rec.remarks || '—'}</span></div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="footer-note">Generated by Workshop Software</span>
+                                <span class="footer-id">${rec.id}</span>
+                            </div>
+                        </div>
+                        <div class="detail-actions">
+                            <button class="btn-share" id="shareDetailBtn"><i class="fab fa-whatsapp"></i> Share on WhatsApp</button>
+                            <button class="btn-copy" id="copyDetailBtn"><i class="fas fa-copy"></i> Copy Detail</button>
+                            <button class="btn-close-detail" id="closeDetailModal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            const existing = document.getElementById('detailModalOverlay');
+            if (existing) existing.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            document.getElementById('closeDetailModal').onclick = () => document.getElementById('detailModalOverlay').remove();
+            document.getElementById('detailModalOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'detailModalOverlay') e.target.remove();
+            });
+            document.getElementById('shareDetailBtn').onclick = () => {
+                const text = `*Dawat e Islami Trust*\n*Receiving Entry Detail*\n\nDate: ${rec.date}\nDay: ${rec.day}\nOffice: ${rec.office}\nItem: ${rec.item}\nQTY: ${rec.qty}\nReceiver Ajeer: ${rec.ajeerCode || '—'}\nReceiver Name: ${rec.receiverName || '—'}\nBox Zimedar Ajeer Code: ${rec.boxZimedarAjeerCode || '—'}\nBox Zimedar Name: ${rec.boxZimedarName || '—'}\nRemarks: ${rec.remarks || '—'}\nRef: ${rec.id}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            };
+            document.getElementById('copyDetailBtn').onclick = () => {
+                const text = `Dawat e Islami Trust — Receiving Entry Detail\nDate: ${rec.date}\nDay: ${rec.day}\nOffice: ${rec.office}\nItem: ${rec.item}\nQTY: ${rec.qty}\nReceiver Ajeer: ${rec.ajeerCode || '—'}\nReceiver Name: ${rec.receiverName || '—'}\nBox Zimedar Ajeer Code: ${rec.boxZimedarAjeerCode || '—'}\nBox Zimedar Name: ${rec.boxZimedarName || '—'}\nRemarks: ${rec.remarks || '—'}\nRef: ${rec.id}`;
+                navigator.clipboard.writeText(text).then(() => showToast('Copied!', 'success')).catch(() => {});
+            };
+        };
+
+        document.getElementById('clearReceivingFilter').onclick = () => {
+            receivingFilters = { date: '', day: '', office: '', item: '', qty: '', ajeerCode: '', receiverName: '', boxZimedarAjeerCode: '', boxZimedarName: '', remarks: '' };
+            receivingSortField = null; receivingSortDir = 'asc';
+            recCurrentPage = 1;
+            buildReceivingTable();
+        };
+
+        // ============ WORKSHOP TABLE ============
+        let workshopSortField = null;
+        let workshopSortDir = 'asc';
+        let workshopFilters = { type: '', date: '', day: '', office: '', item: '', qty: '', zimedar: '', remarks: '' };
+
+        const workshopColumns = [
+            { key: 'type', label: 'Type' },
+            { key: 'date', label: 'Date' },
+            { key: 'day', label: 'Day' },
+            { key: 'office', label: 'Office' },
+            { key: 'item', label: 'Item' },
+            { key: 'qty', label: 'QTY' },
+            { key: 'zimedar', label: 'Zimedar' },
+            { key: 'remarks', label: 'Remarks' }
+        ];
+
+        function buildWorkshopTable() {
+            buildWorkshopHeader();
+            buildWorkshopFilters();
+            renderWorkshopRows();
+        }
+
+        function buildWorkshopHeader() {
+            const headerRow = document.getElementById('workshopHeaderRow');
+            headerRow.innerHTML = '';
+            workshopColumns.forEach(col => {
+                const th = document.createElement('th');
+                const div = document.createElement('div');
+                div.className = 'th-content';
+                const span = document.createElement('span');
+                span.className = 'sortable';
+                span.innerHTML = `${col.label} <i class="fas fa-sort sort-icon"></i>`;
+                span.onclick = () => {
+                    if (workshopSortField === col.key) workshopSortDir = workshopSortDir === 'asc' ? 'desc' : 'asc';
+                    else { workshopSortField = col.key; workshopSortDir = 'asc'; }
+                    renderWorkshopRows();
+                };
+                div.appendChild(span);
+                th.appendChild(div);
+                headerRow.appendChild(th);
+            });
+            const thAct = document.createElement('th');
+            thAct.textContent = 'Actions';
+            thAct.style.textAlign = 'center';
+            headerRow.appendChild(thAct);
+        }
+
+        function buildWorkshopFilters() {
+            const filterRow = document.getElementById('workshopFilterRow');
+            filterRow.innerHTML = '';
+            workshopColumns.forEach(col => {
+                const th = document.createElement('th');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Filter...';
+                input.value = workshopFilters[col.key] || '';
+                input.oninput = (e) => {
+                    workshopFilters[col.key] = e.target.value;
+                    workCurrentPage = 1;
+                    renderWorkshopRows();
+                };
+                th.appendChild(input);
+                filterRow.appendChild(th);
+            });
+            const thAct = document.createElement('th');
+            filterRow.appendChild(thAct);
+        }
+
+        function getFilteredWorkshopData() {
+            let data = [...workshopRecords];
+            const div = getCurrentDivision();
+            if (div) {
+                data = data.filter(r => {
+                    const officeObj = officesList.find(o => o.name === r.office);
+                    return officeObj && officeObj.division === div;
+                });
+            }
+            workshopColumns.forEach(col => {
+                const f = (workshopFilters[col.key] || '').toLowerCase();
+                if (f) data = data.filter(row => String(row[col.key] || '').toLowerCase().includes(f));
+            });
+            return data;
+        }
+
+        function renderWorkshopRows() {
+            let data = getFilteredWorkshopData();
+            if (workshopSortField) {
+                data.sort((a, b) => {
+                    let vA = a[workshopSortField] || '';
+                    let vB = b[workshopSortField] || '';
+                    if (workshopSortField === 'qty') {
+                        vA = Number(vA) || 0; vB = Number(vB) || 0;
+                        return workshopSortDir === 'asc' ? vA - vB : vB - vA;
+                    }
+                    vA = String(vA).toLowerCase(); vB = String(vB).toLowerCase();
+                    if (vA < vB) return workshopSortDir === 'asc' ? -1 : 1;
+                    if (vA > vB) return workshopSortDir === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            const totalCount = data.length;
+            const pageSize = parseInt(document.getElementById('workPageSize').value) || 20;
+            const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+            if (workCurrentPage > totalPages) workCurrentPage = totalPages;
+            const startIdx = (workCurrentPage - 1) * pageSize;
+            const pageData = data.slice(startIdx, startIdx + pageSize);
+
+            const tbody = document.getElementById('workshopTbody');
+            tbody.innerHTML = '';
+            pageData.forEach(rec => {
+                const tr = document.createElement('tr');
+                workshopColumns.forEach(col => {
+                    const td = document.createElement('td');
+                    td.textContent = rec[col.key] !== undefined ? rec[col.key] : '';
+                    tr.appendChild(td);
+                });
+                const actionTd = document.createElement('td');
+                actionTd.className = 'action-cell';
+                actionTd.innerHTML = `
+                    <button class="btn-icon" onclick="editWorkshop('${rec.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon delete" onclick="deleteWorkshop('${rec.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                `;
+                tr.appendChild(actionTd);
+                tbody.appendChild(tr);
+            });
+
+            const totalQty = data.reduce((sum, r) => sum + (Number(r.qty) || 0), 0);
+            const totalRow = document.getElementById('workshopTotalRow');
+            totalRow.innerHTML = '';
+            workshopColumns.forEach((col, idx) => {
+                const td = document.createElement('td');
+                if (col.key === 'qty') td.textContent = `Total: ${totalQty}`;
+                else if (idx === 0) td.textContent = `Count: ${data.length}`;
+                totalRow.appendChild(td);
+            });
+            totalRow.appendChild(document.createElement('td'));
+
+            const showingFrom = totalCount === 0 ? 0 : startIdx + 1;
+            const showingTo = Math.min(startIdx + pageSize, totalCount);
+            document.getElementById('workPageInfo').textContent = `Showing ${showingFrom}–${showingTo} of ${totalCount} entries`;
+
+            buildPagination('workPaginationControls', workCurrentPage, totalPages, 'work');
+        }
+
+        window.editWorkshop = function(id) {
+            const rec = workshopRecords.find(r => String(r.id) === String(id));
+            if (!rec) return;
+            document.getElementById('workEditId').value = rec.id;
+            document.getElementById('workType').value = rec.type;
+            document.getElementById('workDate').value = rec.date;
+            document.getElementById('workDay').value = rec.day;
+            document.getElementById('workOffice').value = rec.office;
+            document.getElementById('workItem').value = rec.item;
+            document.getElementById('workQty').value = rec.qty;
+            refreshWorkshopZimedarDropdown();
+            document.getElementById('workZimedar').value = rec.zimedar;
+            document.getElementById('workRemarks').value = rec.remarks || '';
+            document.getElementById('workSubmitBtn').textContent = 'Update Workshop Entry';
+            document.getElementById('workCancelEdit').style.display = 'inline-block';
+            document.querySelector('#tab-workshop .card').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.deleteWorkshop = function(id) {
+            if (!confirm('Delete this record?')) return;
+            workshopRecords = workshopRecords.filter(r => String(r.id) !== String(id));
+            saveCacheToLocal(); buildWorkshopTable(); renderSummaryTable();
+            showToast('Deleted', 'success');
+            apiCallBackground('deleteWorkshop', { id }).catch(() => fetchFreshData());
+        };
+
+        document.getElementById('clearWorkshopFilter').onclick = () => {
+            workshopFilters = { type: '', date: '', day: '', office: '', item: '', qty: '', zimedar: '', remarks: '' };
+            workshopSortField = null; workshopSortDir = 'asc';
+            workCurrentPage = 1;
+            buildWorkshopTable();
+        };
+
+        // ============ SUMMARY TAB ============
+        function buildSummaryFilters() {
+            const officeSelect = document.getElementById('sumOffice');
+            const zimedarSelect = document.getElementById('sumZimedar');
+            const itemSelect = document.getElementById('sumItem');
+            const divSelect = document.getElementById('sumDivision');
+
+            if (isSuperAdmin()) {
+                divSelect.style.display = 'block';
+            } else {
+                divSelect.style.display = 'none';
+                divSelect.value = getCurrentDivision() || '';
+            }
+
+            const visibleOffices = getVisibleOffices();
+            const prevOffice = officeSelect.value;
+            officeSelect.innerHTML = '<option value="">All Offices</option>';
+            visibleOffices.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.name;
+                opt.textContent = isSuperAdmin() ? `${o.name} (${o.division})` : o.name;
+                officeSelect.appendChild(opt);
+            });
+            if (visibleOffices.some(o => o.name === prevOffice)) officeSelect.value = prevOffice;
+
+            const visibleZimedaran = getVisibleZimedaran();
+            const prevZimedar = zimedarSelect.value;
+            zimedarSelect.innerHTML = '<option value="">All Repairing Zimedar</option>';
+            visibleZimedaran.forEach(z => {
+                const opt = document.createElement('option');
+                opt.value = z.name;
+                opt.textContent = isSuperAdmin() ? `${z.name} (${z.division})` : z.name;
+                zimedarSelect.appendChild(opt);
+            });
+            if (visibleZimedaran.some(z => z.name === prevZimedar)) zimedarSelect.value = prevZimedar;
+
+            const prevItem = itemSelect.value;
+            itemSelect.innerHTML = '<option value="">All Items</option>';
+            itemsList.forEach(i => {
+                const opt = document.createElement('option');
+                opt.value = i.name;
+                opt.textContent = i.name;
+                itemSelect.appendChild(opt);
+            });
+            if (itemsList.some(i => i.name === prevItem)) itemSelect.value = prevItem;
+        }
+
+        function getSummaryFilteredRecords() {
+            const dateStart = document.getElementById('sumDateStart').value;
+            const dateEnd = document.getElementById('sumDateEnd').value;
+            let division = document.getElementById('sumDivision').value;
+            if (!isSuperAdmin()) division = getCurrentDivision();
+            const office = document.getElementById('sumOffice').value;
+            const zimedar = document.getElementById('sumZimedar').value;
+            const item = document.getElementById('sumItem').value;
+            const receiver = document.getElementById('sumReceiver').value.toLowerCase().trim();
+            const boxZimedar = document.getElementById('sumBoxZimedar').value.toLowerCase().trim();
+
+            let filteredReceiving = receivingRecords.filter(rec => {
+                if (dateStart && rec.date < dateStart) return false;
+                if (dateEnd && rec.date > dateEnd) return false;
+                if (office && rec.office !== office) return false;
+                if (item && rec.item !== item) return false;
+                if (receiver) {
+                    const match = (rec.ajeerCode || '').toLowerCase().includes(receiver) ||
+                                  (rec.receiverName || '').toLowerCase().includes(receiver);
+                    if (!match) return false;
+                }
+                if (boxZimedar) {
+                    const bzAjeer = (rec.boxZimedarAjeerCode || '').toLowerCase();
+                    const bzName = (rec.boxZimedarName || '').toLowerCase();
+                    if (!bzAjeer.includes(boxZimedar) && !bzName.includes(boxZimedar)) return false;
+                }
+                if (division) {
+                    const officeObj = officesList.find(o => o.name === rec.office);
+                    if (!officeObj || officeObj.division !== division) return false;
+                }
+                return true;
+            });
+
+            let filteredWorkshop = workshopRecords.filter(rec => {
+                if (dateStart && rec.date < dateStart) return false;
+                if (dateEnd && rec.date > dateEnd) return false;
+                if (office && rec.office !== office) return false;
+                if (item && rec.item !== item) return false;
+                if (zimedar && rec.zimedar !== zimedar) return false;
+                if (division) {
+                    const officeObj = officesList.find(o => o.name === rec.office);
+                    if (!officeObj || officeObj.division !== division) return false;
+                }
+                return true;
+            });
+
+            return { filteredReceiving, filteredWorkshop };
+        }
+
+        function renderSummaryTable() {
+            const { filteredReceiving, filteredWorkshop } = getSummaryFilteredRecords();
+            const itemSummary = {};
+
+            filteredReceiving.forEach(rec => {
+                if (!itemSummary[rec.item]) itemSummary[rec.item] = { receive: 0, repair: 0, scrape: 0 };
+                itemSummary[rec.item].receive += Number(rec.qty) || 0;
+            });
+            filteredWorkshop.forEach(rec => {
+                if (!itemSummary[rec.item]) itemSummary[rec.item] = { receive: 0, repair: 0, scrape: 0 };
+                if (rec.type === 'Repair') itemSummary[rec.item].repair += Number(rec.qty) || 0;
+                if (rec.type === 'Scrape') itemSummary[rec.item].scrape += Number(rec.qty) || 0;
+            });
+
+            const tbody = document.getElementById('summaryTbody');
+            tbody.innerHTML = '';
+
+            let totalReceive = 0, totalRepair = 0, totalScrape = 0, totalRemaining = 0;
+
+            Object.keys(itemSummary).sort().forEach(item => {
+                const s = itemSummary[item];
+                const remaining = Math.max(0, s.receive - s.repair - s.scrape);
+                totalReceive += s.receive;
+                totalRepair += s.repair;
+                totalScrape += s.scrape;
+                totalRemaining += remaining;
+                tbody.innerHTML += `<tr><td>${item}</td><td>${s.receive}</td><td>${s.repair}</td><td>${s.scrape}</td><td><strong>${remaining}</strong></td></tr>`;
+            });
+
+            if (Object.keys(itemSummary).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#64748b; padding:20px;">No records match the filters.</td></tr>';
+            }
+
+            document.getElementById('summaryTfoot').innerHTML = `
+                <tr class="total-row">
+                    <td><strong>Total</strong></td>
+                    <td><strong>${totalReceive}</strong></td>
+                    <td><strong>${totalRepair}</strong></td>
+                    <td><strong>${totalScrape}</strong></td>
+                    <td><strong>${totalRemaining}</strong></td>
+                </tr>
+            `;
+        }
+
+        document.getElementById('applySummaryFilter').onclick = renderSummaryTable;
+        document.getElementById('clearSummaryFilter').onclick = () => {
+            document.getElementById('sumDateStart').value = '';
+            document.getElementById('sumDateEnd').value = '';
+            if (isSuperAdmin()) document.getElementById('sumDivision').value = '';
+            document.getElementById('sumOffice').value = '';
+            document.getElementById('sumZimedar').value = '';
+            document.getElementById('sumItem').value = '';
+            document.getElementById('sumReceiver').value = '';
+            document.getElementById('sumBoxZimedar').value = '';
+            renderSummaryTable();
+        };
+
+        // ============ STOCK MODAL ============
+        function showStockModal() {
+            let modalHtml = `
+                <div class="modal-overlay" id="stockModalOverlay">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-warehouse"></i> Stock Report</h3>
+                            <button class="modal-close" id="closeStockModal">&times;</button>
+                        </div>
+                        <div style="display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap;">
+                            <label style="font-size:0.85rem; font-weight:600;">Date Start:</label>
+                            <input type="date" id="stockDateStart" style="padding:8px 12px; border-radius:12px; border:1px solid #cbd5e1;">
+                            <label style="font-size:0.85rem; font-weight:600;">Date End:</label>
+                            <input type="date" id="stockDateEnd" style="padding:8px 12px; border-radius:12px; border:1px solid #cbd5e1;">
+                            <button class="btn-primary" id="applyStockFilter" style="padding:8px 18px; font-size:0.8rem;">Apply</button>
+                            <button class="btn-clear-filter" id="clearStockFilter" style="padding:8px 18px; font-size:0.8rem;">Clear</button>
+                        </div>
+                        <div id="stockTableContainer" style="overflow-x: auto; max-height: 400px;"></div>
+                    </div>
+                </div>
+            `;
+            const existingModal = document.getElementById('stockModalOverlay');
+            if (existingModal) existingModal.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            renderStockTable();
+            document.getElementById('closeStockModal').onclick = () => document.getElementById('stockModalOverlay').remove();
+            document.getElementById('stockModalOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'stockModalOverlay') e.target.remove();
+            });
+            document.getElementById('applyStockFilter').onclick = renderStockTable;
+            document.getElementById('clearStockFilter').onclick = () => {
+                document.getElementById('stockDateStart').value = '';
+                document.getElementById('stockDateEnd').value = '';
+                renderStockTable();
+            };
+        }
+
+        function renderStockTable() {
+            const dateStart = document.getElementById('stockDateStart')?.value || '';
+            const dateEnd = document.getElementById('stockDateEnd')?.value || '';
+            const div = getCurrentDivision();
+
+            let filteredReceiving = receivingRecords.filter(rec => {
+                if (dateStart && rec.date < dateStart) return false;
+                if (dateEnd && rec.date > dateEnd) return false;
+                if (div) {
+                    const officeObj = officesList.find(o => o.name === rec.office);
+                    if (!officeObj || officeObj.division !== div) return false;
+                }
+                return true;
+            });
+            let filteredWorkshop = workshopRecords.filter(rec => {
+                if (dateStart && rec.date < dateStart) return false;
+                if (dateEnd && rec.date > dateEnd) return false;
+                if (div) {
+                    const officeObj = officesList.find(o => o.name === rec.office);
+                    if (!officeObj || officeObj.division !== div) return false;
+                }
+                return true;
+            });
+
+            const receivedMap = {}, repairedMap = {}, scrapedMap = {};
+            filteredReceiving.forEach(rec => {
+                const key = `${rec.office}||${rec.item}`;
+                receivedMap[key] = (receivedMap[key] || 0) + (Number(rec.qty) || 0);
+            });
+            filteredWorkshop.filter(w => w.type === 'Repair').forEach(rec => {
+                const key = `${rec.office}||${rec.item}`;
+                repairedMap[key] = (repairedMap[key] || 0) + (Number(rec.qty) || 0);
+            });
+            filteredWorkshop.filter(w => w.type === 'Scrape').forEach(rec => {
+                const key = `${rec.office}||${rec.item}`;
+                scrapedMap[key] = (scrapedMap[key] || 0) + (Number(rec.qty) || 0);
+            });
+
+            const allKeys = new Set([...Object.keys(receivedMap), ...Object.keys(repairedMap), ...Object.keys(scrapedMap)]);
+            let rows = [];
+            allKeys.forEach(key => {
+                const [office, item] = key.split('||');
+                const received = receivedMap[key] || 0;
+                const repaired = repairedMap[key] || 0;
+                const scraped = scrapedMap[key] || 0;
+                const remainingStock = Math.max(0, received - repaired - scraped);
+                if (received > 0 || repaired > 0 || scraped > 0) {
+                    rows.push({ office, item, received, repaired, scraped, remainingStock });
+                }
+            });
+            rows.sort((a, b) => a.office.localeCompare(b.office) || a.item.localeCompare(b.item));
+
+            const container = document.getElementById('stockTableContainer');
+            if (!container) return;
+            if (rows.length === 0) {
+                container.innerHTML = '<p style="text-align:center; padding:20px; color:#64748b;">No stock data available.</p>';
+                return;
+            }
+            container.innerHTML = `
+                <table>
+                    <thead><tr><th>Office</th><th>Item</th><th>Received</th><th>Repaired</th><th>Scraped</th><th>Non Repair (Bal.)</th></tr></thead>
+                    <tbody>${rows.map(r => `<tr><td>${r.office}</td><td>${r.item}</td><td>${r.received}</td><td>${r.repaired}</td><td>${r.scraped}</td><td><strong>${r.remainingStock}</strong></td></tr>`).join('')}</tbody>
+                </table>
+            `;
+        }
+
+        document.getElementById('receivingStockBtn').onclick = showStockModal;
+        document.getElementById('workshopStockBtn').onclick = showStockModal;
+
+        // ============ INITIAL SETUP ============
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('recDate').value = today;
+        document.getElementById('workDate').value = today;
+        setTimeout(() => {
+            document.getElementById('recDate').dispatchEvent(new Event('change'));
+            document.getElementById('workDate').dispatchEvent(new Event('change'));
+        }, 50);
+
+        setInterval(() => {
+            if (currentUser && !isFetching) {
+                fetchFreshData();
+            }
+        }, 60000);
+
+        // ============ PAGE LOAD ============
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!checkAutoLogin()) {
+                loginView.classList.remove('hidden');
+                dashboardView.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
